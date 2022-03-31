@@ -1,6 +1,6 @@
 ## 前言
 
-> 上一篇我们讲述了Service的进阶用法，特别是在使用跨进程Service的时候，我们使用了AIDL技术，本篇我们先不去聊Bindder的具体实现细节，而是来具体理一理所谓的AIDL技术到底帮我们做了什么事情。
+> 上一篇我们讲述了Service的进阶用法，特别是在使用跨进程Service的时候，我们使用了AIDL技术，本篇我们具体来理一理所谓的AIDL技术，它到底帮我们做了什么事情。
 
 ## 一、AIDL生成了什么文件
 
@@ -871,7 +871,13 @@ public class Proxy implements com.afs.rethinkingservice.maidl.MainAidlService {
 最终同步走完这段代码，来到关键点11处，成功返回函数调用结果
 
 > 总结一句话， mBinder = Stub.asInterface(service)这个方法，当MainService和MainActivity两者处于同一个进程的时候，直接返回MainBinder实例对象。
-> 当两者不在同一个进程的时候，会自动创建一个内部持有Binder实例的Proxy代理对象，内部通过Binder来实现进程间方法调用通信功能
+> 当两者不在同一个进程的时候，会自动创建一个内部持有Binder实例的Proxy代理对象，内部通过Binder来实现进程间方法调用通信功能。
+
+- 【MainAidlService】接口类，可以理解为通信的协议标准，，其他三个类都实现了这个接口
+- 【Default】类，在低版本SDK编译器，AIDL不会生成这个类，而在高版本SDK编译器中，Aidl会生成这个类，MainAidlService接口的默认实现类。
+- 【Stub】抽象类，继承自android.os.Binder并实现了MainAidlService接口，我们的MainBinder就是继承了它，asInterface()和onTransact()
+  方法是他的核心。
+- 【Proxy】类，实现了MainAidlService接口，远程IPC通讯的具体实现类，内部持有Binder实例对象，调用Binder的transact()方法实现跨进程通信
 
 ## 四、验证我们的结论
 

@@ -12,7 +12,9 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
 rootProject.name = "RethinkingService"
 include ':01ServiceTest'
 include ':02ServiceTest'
 include ':ClientTest'
+include ':03ServiceTest'

@@ -1,8 +1,8 @@
-### 前言
+## 前言
 
 > 上一篇我们讲述了Service的基础用法，这次我们要在之前的基础上继续重新认识Service
 
-### 一、Service导致的ANR现象
+## 一、Service导致的ANR现象
 
 在上篇文章中我们知道了，Service其实也是运行在主线程里的，如果直接在Service中处理一些耗时的逻辑，就会导致程序ANR。  
 如下所示，我们让onStartCommand方法休眠60秒。
@@ -59,13 +59,13 @@ public class MainService extends Service {
 当我们点击开启服务或者绑定服务的时候，程序就会阻塞住并无法进行任何其它操作，过一段时间后就会弹出ANR的提示框，如下图所示。
 ![ANR异常](picture/ANR.jpg)
 
-### 二、创建远程Service
+## 二、创建远程Service
 
 由于我们之前所使用的Service其实都是本地服务，本地服务默认也是处于主线程之中， 我们应该在Service中开启线程去执行耗时任务，这样就可以有效地避免ANR的出现
 
 如果我们既不想使用线程，又不想ANR出现，那么我们就可以考虑远程服务了。
 
-##### 2.1 创建
+### 2.1 创建
 
 要创建一个远程服务，我们只需要在注册Service的时候将它的android:process属性指定成:remote就可以了，代码如下所示：
 
@@ -122,12 +122,12 @@ public class MainService extends Service {
 
 我们可以看到线程ID和进程ID都不一样了。
 
-### 三、关联远程Service
+## 三、关联远程Service
 
 既然远程Service这么好用，干脆以后我们把所有的Service都转换成远程Service吧，还省得再开启线程了？  
 其实不然，远程Service非但不好用，甚至可以称得上是较为难用。一般情况下如果可以不使用远程Service，就尽量不要使用它。
 
-##### 3.1 远程进程存在的问题
+### 3.1 远程进程存在的问题
 
 修改MainService的代码，去除休眠，如下所示：
 
@@ -186,7 +186,7 @@ java.lang.ClassCastException: android.os.BinderProxy cannot be cast to com.afs.r
 这是由于在BindService按钮的点击事件里面我们会让MainActivity和MyService建立关联，但是目前MyService已经是一个远程Service了，  
 Activity和Service运行在两个不同的进程当中，这时就不能再使用传统的建立关联的方式，程序也就崩溃了。
 
-##### 3.2 创建AIDL
+### 3.2 创建AIDL
 
 为了让Activity与一个远程Service建立关联，我们就需要使用AIDL来进行跨进程通信了（IPC）。 AIDL（Android Interface Definition
 Language）是Android接口定义语言的意思，它可以用于让某个Service与多个应用程序组件之间进行跨进程通信， 从而可以实现多个应用程序共享同一个Service的功能。
@@ -208,7 +208,7 @@ interface MainAIDLService {
 然后编译，编译器会在build文件夹中自动帮我们创建一些Java类。
 ![AIDL创建流程](picture/AIDL创建流程.png)
 
-##### 3.3 使用AIDL相关类
+### 3.3 使用AIDL相关类
 
 修改MainService中的代码，在里面实现我们刚刚定义好的MyAIDLService接口，如下所示：
 
@@ -332,13 +332,13 @@ public class MainActivity extends AppCompatActivity {
 
 由此可见，我们确实已经成功实现跨进程通信了，在一个进程中访问到了另外一个进程中的方法。
 
-### 四、跨应用访问Service
+## 四、跨应用访问Service
 
 我们目前的跨进程通信实际上并没有什么实质上的作用，因为这只是在一个Activity里调用了同一个应用程序的Service里的方法。  
 而跨进程通信的真正意义是为了让一个应用程序去访问另一个应用程序中的Service，以实现共享Service的功能。
 那么下面我们自然要尝试一下，如何才能在其它的应用程序中调用到MainService里的方法。
 
-##### 4.1 普通的关联
+### 4.1 普通的关联
 
 之前我们让Activity与Service之间建立关联，都是调用bindService()方法，并将Intent作为参数传递进去，在Intent里指定好要绑定的Service：
 
@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
        bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
 ```
 
-##### 4.1 隐式关联
+### 4.1 隐式关联
 
 这里在构建Intent的时候是使用MainService.class来指定要绑定哪一个Service的，但是在另一个应用程序中去绑定Service的时候并没有MyService这个类，这时就必须使用到隐式Intent了。  
 现在修改AndroidManifest.xml中的代码，给MainService加上一个action：
@@ -365,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
 这就说明，MainService可以响应带有com.afs.rethinkingservice.maidl.MainAIDLService这个action的Intent。
 现在重新运行一下程序，这样就把远程Service端的工作全部完成了。
 
-##### 4.2 创建客户端app
+### 4.2 创建客户端app
 
 创建一个新的Android模块，起名为ClientTest，我们就尝试在这个程序中远程调用MainService中的方法。
 

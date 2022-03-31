@@ -1,10 +1,10 @@
-### 前言
+## 前言
 
 > Service作为Android四大组件之一，在每一个应用程序中都扮演着非常重要的角色。它主要用于在后台处理一些耗时的逻辑，或者去执行某些需要长期运行的任务。必要的时候我们甚至可以在程序退出的情况下，让Service在后台继续保持运行状态。
 
-### 一、Service的基本用法
+## 一、Service的基本用法
 
-##### 1.1、创建Service
+### 1.1、创建Service
 
 关于Service最基本的用法自然就是如何启动一个Service了，启动Service的方法和启动Activity很类似，都需要借助Intent来实现，下面我们就通过一个具体的例子来看一下。  
 然后新建一个MainService继承自Service，并重写父类的onCreate()、onStartCommand()和onDestroy()方法，如下所示：
@@ -45,7 +45,7 @@ public class MainService extends Service {
 
 我们只是在onCreate()、onStartCommand()和onDestroy()方法中分别打印了一句话，并没有进行其它任何的操作。
 
-##### 1.2、在Activity中开启Service
+### 1.2、在Activity中开启Service
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-##### 1.3、AndroidManifest.xml文件信息：
+### 1.3、AndroidManifest.xml文件信息：
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 </manifest>
 ```
 
-##### 1.4、点击【开启服务】，日志信息如下
+### 1.4、点击【开启服务】，日志信息如下
 
 ```cmd
 2022-03-30 15:04:10.300 20476-20476/com.afs.rethinkingservice01 D/MainActivity=========: onCreate() executed
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
 也就是说，**当启动一个Service的时候，会调用该Service中的onCreate()和onStartCommand()方法。**
 
-##### 1.5、再次点击开启StartService，日志信息如下
+### 1.5、再次点击开启StartService，日志信息如下
 
 ```cmd
 2022-03-30 15:04:10.300 20476-20476/com.afs.rethinkingservice01 D/MainActivity=========: onCreate() executed
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 不管怎样调用startService()方法，onCreate()方法都不会再执行。   
 后续再次点击【开启服务】，每次都只会有onStartCommand()方法中的打印日志。
 
-##### 1.6、点击【停止服务】按钮，销毁Service，会触发服务的onDestroy方法
+### 1.6、点击【停止服务】按钮，销毁Service，会触发服务的onDestroy方法
 
 ```cmd
 2022-03-30 15:04:10.300 20476-20476/com.afs.rethinkingservice01 D/MainActivity=========: onCreate() executed
@@ -149,11 +149,11 @@ public class MainActivity extends AppCompatActivity {
 2022-03-30 15:13:15.407 20476-20476/com.afs.rethinkingservice01 D/MainService=========: onDestroy() executed
 ```
 
-### 二、Service和Activity的通讯
+## 二、Service和Activity的通讯
 
 接下来我们尝试让Activity和Service建立关联，然后让Activity指定Service去执行一些什么任务。
 
-##### 2.1、首先是MainService的代码，新增一个内部类MainBinder,为其添加一个方法onStartDownload()，并在onBind方法中返回
+### 2.1、首先是MainService的代码，新增一个内部类MainBinder,为其添加一个方法onStartDownload()，并在onBind方法中返回
 
 ```java
 public class MainService extends Service {
@@ -198,7 +198,7 @@ public class MainService extends Service {
 }
 ```
 
-##### 2.2、然后是MainActivity的代码，新增一个【绑定服务】按钮；
+### 2.2、然后是MainActivity的代码，新增一个【绑定服务】按钮；
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -268,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-##### 2.3、点击【绑定服务】按钮，日志信息如下
+### 2.3、点击【绑定服务】按钮，日志信息如下
 
 ```cmd
 2022-03-30 15:29:52.887 21416-21416/com.afs.rethinkingservice01 D/MainActivity=========: onCreate() executed
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
 
 从日志信息可以看出，我们成功获取到了MainService中的MainBinder实例，这样我们就可以控制他做我们想做的事情了。
 
-##### 2.3、点击【解绑服务】按钮，日志信息如下
+### 2.3、点击【解绑服务】按钮，日志信息如下
 
 如果我们想要解绑服务，我们只需要调用 unbindService(mServiceConnection)方法即可。
 
@@ -294,18 +294,18 @@ public class MainActivity extends AppCompatActivity {
 2022-03-30 15:47:03.417 22168-22168/com.afs.rethinkingservice01 D/MainService=========: onDestroy() executed
 ```
 
-### 三、销毁Service
+## 三、销毁Service
 
-##### 3.1、startService(intent)和stopService(intent)
+### 3.1、startService(intent)和stopService(intent)
 
 我们调用startService(intent)和stopService(intent)方法分别实现了Service的启动和销毁；
 
-##### 3.2、bindService(intent, mServiceConnection, BIND_AUTO_CREATE)和 unbindService(mServiceConnection)
+### 3.2、bindService(intent, mServiceConnection, BIND_AUTO_CREATE)和 unbindService(mServiceConnection)
 
 由于在绑定Service的时候指定的标志位是BIND_AUTO_CREATE，说明点击Bind Service按钮的时候Service也会被创建，
 这时候其实也很简单，点击一下【解绑服务】按钮，将Activity和Service的关联解除，Service就会跟着销毁了
 
-##### 3.3 既点击了startService，又点击了bindService
+### 3.3 既点击了startService，又点击了bindService
 
 这个时候你会发现，不管你是单独点击Stop Service按钮还是Unbind Service按钮，Service都不会被销毁，必要将两个按钮都点击一下，Service才会被销毁。  
 也就是说，点击Stop Service按钮只会让Service停止，点击Unbind Service按钮只会让Service和Activity解除关联，  
@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
 
 ### 四、Service和Thread的关系
 
-##### 4.1 不少Android初学者都可能会有这样的疑惑，Service和Thread到底有什么关系呢？ 什么时候应该用Service，什么时候又应该用Thread？
+####4.1 不少Android初学者都可能会有这样的疑惑，Service和Thread到底有什么关系呢？ 什么时候应该用Service，什么时候又应该用Thread？
 
 答案可能会有点让你吃惊，因为Service和Thread之间没有任何关系！ 之所以有不少人会把它们联系起来，主要就是因为Service的后台概念。
 Thread我们大家都知道，是用于开启一个子线程，在这里去执行一些耗时操作就不会阻塞主线程的运行。  
@@ -347,7 +347,7 @@ Android的后台就是指，它的运行是完全不依赖UI的。即使Activity
 在这里一直执行着心跳连接，难道就不会阻塞主线程的运行吗？  
 当然会，但是我们可以在Service中再创建一个子线程，然后在这里去处理耗时逻辑就没问题了。
 
-##### 4.2 下面是一个比较标准的Service
+### 4.2 下面是一个比较标准的Service
 
 ```java
 public class MainService extends Service {
@@ -411,7 +411,7 @@ public class MainService extends Service {
 }
 ```
 
-### 五、前台Service
+## 五、前台Service
 
 Service几乎都是在后台运行的，一直以来它都是默默地做着辛苦的工作。但是Service的系统优先级还是比较低的，当系统出现内存不足情况时，就有可能会回收掉正在后台运行的Service。  
 如果你希望Service可以一直保持运行状态，而不会由于系统内存不足的原因导致被回收，就可以考虑使用前台Service。  
@@ -419,7 +419,7 @@ Service几乎都是在后台运行的，一直以来它都是默默地做着辛�
 当然有时候你也可能不仅仅是为了防止Service被回收才使用前台Service，有些项目由于特殊的需求会要求必须使用前台Service，  
 比如说墨迹天气，它的Service在后台更新天气数据的同时，还会在系统状态栏一直显示当前天气的信息。
 
-##### 5.1 创建前台Service
+### 5.1 创建前台Service
 
 修改MainService的代码，如下所示：
 

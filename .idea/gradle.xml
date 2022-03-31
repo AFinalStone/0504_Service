@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/01ServiceTest" />
             <option value="$PROJECT_DIR$/02ServiceTest" />
+            <option value="$PROJECT_DIR$/03ServiceTest" />
             <option value="$PROJECT_DIR$/ClientTest" />
           </set>
         </option>

@@ -32,20 +32,322 @@
 无论是哪种进程间通信，都是需要一个进程提供数据，一个进程获取数据。因此，我们可以把提供数据的一端称为服务端，把获取数据的一端称为客户端。  
 从这个角度来看Binder是不是就有点类似于HTTP协议了？所以，你完全可以把Binder当成是一种HTTP协议，客户端通过Binder来获取服务端的数据。  
 认识到这一点，再看Binder的使用就会简单很多。   
-这里我们继续使用前面几篇文章中出现的例子，服务端提供把字符串转化成大写的接口，客户端连接服务端来实现字符串小写转大写的功能，而客户端与服务端的媒介就是Binder。
+这里我们继续使用前面几篇文章中出现的例子：
+
+**服务端提供把字符串转化成大写的接口，客户端连接服务端来实现字符串小写转大写的功能，而客户端与服务端的媒介就是Binder。**
 
 ### 2.1 服务端的实现
 
 ```java
+public class MainService extends Service {
 
+    public static final String TAG = "MainService=========";
+    public static final int Request_ToUpperCase = 100;
+
+    IBinder mBinder = new Binder() {
+        @Override
+        protected boolean onTransact(int code, @NonNull Parcel data, @Nullable Parcel reply, int flags) throws RemoteException {
+            if (Request_ToUpperCase == code) {
+                String text = data.readString();
+                String newText = text.toUpperCase();
+                reply.writeString(newText);
+                return true;
+            }
+            return super.onTransact(code, data, reply, flags);
+        }
+    };
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind() executed");
+        return mBinder;
+    }
+
+
+}
 ```
 
+```xml
 
+<service android:name="com.afs.rethinkingservice.MainService" android:process=":remote" />
+```
 
+服务端的代码就是返回一个Binder实例，重写onTransact()，当code=100的时候，读取data中的字符串，  
+然后调用该字符串的toUpperCase方法获取大写字符串，再把字符串写到reply中。
 
+### 2.2 客户端的实现
 
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical"
+    tools:context=".MainActivity">
 
+    <Button android:id="@+id/btn_bind_service" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="绑定服务" />
 
+    <Button android:id="@+id/change_text_to_uppercase" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="修改字符串" />
 
+</LinearLayout>
+```
 
+```java
+public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "MainActivity=========";
 
+    private IBinder mBinder;// 远程服务的Binder
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "onServiceDisconnected() executed");
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected() executed");
+            mBinder = service;
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        findViewById(R.id.btn_bind_service).setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, MainService.class);
+            bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
+        });
+        findViewById(R.id.change_text_to_uppercase).setOnClickListener(v -> {
+            try {
+                String text = "aaabbbcccddd";
+                Parcel parcel = Parcel.obtain();
+                Parcel replay = Parcel.obtain();
+                parcel.writeString(text);
+                mBinder.transact(MainService.Request_ToUpperCase, parcel, replay, 0);
+                String newText = replay.readString();
+                Log.d(TAG, "newText === " + newText);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+}
+```
+
+客户端的代码就是通过绑定远程服务，然后获取到IBinder实例，再调用IBinder的transact方法，把需要转化为大写的字符串aaabbbcccddd写入到parcel中，
+等待transact方法执行完毕，再从replay中读取字符串数据，而这个字符串就是AAABBBCCCDDD。
+
+### 2.3 验证结果
+
+启动app，点击绑定服务，再点击修改字符串的按钮，日志信息如下：
+
+```cmd
+2022-04-01 10:00:50.091 29125-29125/com.afs.rethinkingservice04 D/MainService=========: onBind() executed
+2022-04-01 10:00:50.093 29077-29077/com.afs.rethinkingservice04 D/MainActivity=========: onServiceConnected() executed
+2022-04-01 10:00:52.991 29077-29077/com.afs.rethinkingservice04 D/MainActivity=========: newText === AAABBBCCCDDD
+```
+
+可见，使用Binder实现进程间通信是非常简单的，可以说简单的有点出乎所料。
+
+## 三、优化Binder进程通信
+
+上面我们虽然很轻易的用Binder实现了进程间通信，但其实这个方案还可以继续进行优化。
+
+### 3.1 定义一个小写转大写的接口：
+
+```java
+public interface ChangeStringInterface {
+    /**
+     * 把小写字符串转化成大写字符串
+     *
+     * @param str
+     * @return
+     */
+    public String toUpperCase(String str);
+}
+```
+
+### 3.2 定义一个ChangeStringInterface的接口实现类，且这个类继承了Binder：
+
+```java
+public class ChangeStringImpl extends Binder implements ChangeStringInterface {
+    public static final int Request_ToUpperCase = 100;
+
+    @Override
+    public String toUpperCase(String text) {
+        return text.toUpperCase();
+    }
+
+    @Override
+    protected boolean onTransact(int code, @NonNull Parcel data, @Nullable Parcel reply, int flags) throws RemoteException {
+        if (Request_ToUpperCase == code) {
+            String text = data.readString();
+            String newText = toUpperCase(text);
+            reply.writeString(newText);
+            return true;
+        }
+        return super.onTransact(code, data, reply, flags);
+    }
+}
+```
+
+我们重写Binder的onTransact，并在该方法内部调用toUpperCase()方法来实现字符串小写转大写的功能。
+
+### 3.3 修改MainService中的代码
+
+```java
+public class MainService extends Service {
+
+    public static final String TAG = "MainService=========";
+
+    IBinder mBinder = new ChangeStringImpl();
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind() executed");
+        return mBinder;
+    }
+
+}
+```
+
+我们使用IBinder mBinder = new ChangeStringImpl()来替换到之前的IBinder mBinder = new Binder();
+
+### 3.4 优化客户端的代码
+
+我们来创建一个ChangeStringProxy类。
+
+```java
+public class ChangeStringProxy implements ChangeStringInterface {
+    public static final String TAG = "Proxy=========";
+
+    private IBinder mBinder;
+
+    //构造方法私有化，只能被asInterface调用
+    private ChangeStringProxy(IBinder binder) {
+        this.mBinder = binder;
+    }
+
+    // 通过Binde把小写字符串转化为大写字符串
+    @Override
+    public String toUpperCase(String str) {
+        try {
+            Parcel parcel = Parcel.obtain();
+            Parcel replay = Parcel.obtain();
+            parcel.writeString(str);
+            mBinder.transact(ChangeStringImpl.Request_ToUpperCase, parcel, replay, 0);
+            return replay.readString();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // 实例化Binder代理类的对象
+    public static ChangeStringInterface asInterface(IBinder binder) {
+        if (binder == null) {
+            return null;
+        }
+        if (binder instanceof ChangeStringInterface) {
+            Log.d(TAG, "当前进程");
+            // 如果是同一个进程的请求，则直接返回Binder
+            return (ChangeStringInterface) binder;
+        } else {
+            Log.d(TAG, "远程进程");
+            // 如果是跨进程查询则返回Binder的代理对象
+            return new ChangeStringProxy(binder);
+        }
+    }
+
+}
+```
+
+ChangeStringProxy也实现ChangeStringInterface接口，，在toUpperCase中调用Binder实现Binder通信，同时构造方法需要传入Binder对象实例。
+另外我们把构造方法设置成了private，同时提供了一个asInterface方法，这个方法通过判断Binder是不是IGradeInterface类型从而确定是不是跨进程的通信。  
+如果不是跨进程通信，则返回当前这个Binder，其实就是我们在MainService的OnBinder方法中返回的ChangeStringImpl实例对象，否则就返回ChangeStringProxy这个IBinder的代理类。
+
+然后修改MainActivity中的代码：
+
+```java
+public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "MainActivity=========";
+
+    private ChangeStringInterface mBinder;// 远程服务的Binder
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "onServiceDisconnected() executed");
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "onServiceConnected() executed");
+            mBinder = ChangeStringProxy.asInterface(service);
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        findViewById(R.id.btn_bind_service).setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, MainService.class);
+            bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
+        });
+        findViewById(R.id.change_text_to_uppercase).setOnClickListener(v -> {
+            String text = "aaabbbcccddd";
+            String newText = mBinder.toUpperCase(text);
+            Log.d(TAG, "newString === " + newText);
+        });
+    }
+}
+```
+
+在ServiceConnection的onServiceConnected方法中，调用ChangeStringProxy.asInterface方法对mBinder对象实例化。  
+然后就可以调用mBinder.toUpperCase实现小写字符串转大写的功能了。
+
+**有看过前面几篇文章的小伙伴一看应该就明白了，我们手动构建服务端和客户端的这个过程，其实就是之前篇章中，aidl帮我们做的事情。
+
+类比上篇文章我们可以看出来：
+
+- ChangeStringInterface 对应 MainAidlService
+- ChangeStringProxy 对应 Proxy
+- ChangeStringImpl 对应 Stub对象
+
+## 四、验证结果
+
+最后来验证一下我们是否真的实现了字符串小写转大写的功能。
+
+### 4.1 远程进程通信结果
+
+启动app，点击修改字符串，日志信息如下所示：
+
+```cmd
+2022-04-01 10:46:28.284 30400-30400/com.afs.rethinkingservice04 D/MainService=========: onBind() executed
+2022-04-01 10:46:28.286 30344-30344/com.afs.rethinkingservice04 D/MainActivity=========: onServiceConnected() executed
+2022-04-01 10:46:28.286 30344-30344/com.afs.rethinkingservice04 D/Proxy=========: 远程进程
+2022-04-01 10:46:31.458 30344-30344/com.afs.rethinkingservice04 D/MainActivity=========: newString === AAABBBCCCDDD
+```
+
+### 4.2 本地进程通信结果
+
+去掉AndroidManifest.xml中**android:process=":remote"**字段，然后重新编译运行app，点击修改字符串，日志信息如下所示：
+
+```cmd
+2022-04-01 11:07:20.448 31438-31438/com.afs.rethinkingservice04 D/MainService=========: onBind() executed
+2022-04-01 11:07:20.454 31438-31438/com.afs.rethinkingservice04 D/MainActivity=========: onServiceConnected() executed
+2022-04-01 11:07:20.454 31438-31438/com.afs.rethinkingservice04 D/Proxy=========: 当前进程
+2022-04-01 11:07:27.348 31438-31438/com.afs.rethinkingservice04 D/MainActivity=========: newString === AAABBBCCCDDD
+```
+
+本篇文章主要带大家认识了进程间通信和Binder与AIDL的使用。通过本篇文章的学习可以发现Binder与AIDL其实是非常简单的。  
+在了解了Binder之后，我们就可以去更加深入的学习Android Framework层的知识了。

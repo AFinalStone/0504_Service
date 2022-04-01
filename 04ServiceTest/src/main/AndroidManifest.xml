@@ -18,13 +18,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service
-            android:name="com.afs.rethinkingservice.MainService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.afs.rethinkingservice.maidl.MainAIDLService" />
-            </intent-filter>
-        </service>
+        <service android:name="com.afs.rethinkingservice.MainService" />
     </application>
 
 </manifest>

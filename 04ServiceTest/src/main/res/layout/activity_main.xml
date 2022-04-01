@@ -7,28 +7,15 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/btn_start_service"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="开启服务" />
-
-    <Button
         android:id="@+id/btn_bind_service"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="绑定服务" />
 
     <Button
-        android:id="@+id/btn_test_aidl_method"
+        android:id="@+id/change_text_to_uppercase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="测试AIDL中的方法" />
-
-    <Button
-        android:id="@+id/btn_stop_service"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="停止服务" />
-
+        android:text="修改字符串" />
 
 </LinearLayout>

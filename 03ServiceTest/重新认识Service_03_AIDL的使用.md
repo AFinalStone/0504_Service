@@ -209,7 +209,7 @@ public interface MainAIDLService extends android.os.IInterface {
 
         /**
          * Cast an IBinder object into an com.afs.rethinkingservice.maidl.MainAIDLService interface,
-         * generating a proxy if needed.
+         * generating a buyFoodProxy if needed.
          */
         public static com.afs.rethinkingservice.maidl.MainAIDLService asInterface(android.os.IBinder obj) {
             if ((obj == null)) {
@@ -509,7 +509,7 @@ public abstract class Stub extends android.os.Binder implements com.afs.rethinki
 
     /**
      * Cast an IBinder object into an com.afs.rethinkingservice.maidl.MainAidlService interface,
-     * generating a proxy if needed.
+     * generating a buyFoodProxy if needed.
      */
     public static com.afs.rethinkingservice.maidl.MainAidlService asInterface(android.os.IBinder obj) {
         if ((obj == null)) {
@@ -721,7 +721,7 @@ public abstract class Stub extends android.os.Binder implements com.afs.rethinki
 
     /**
      * Cast an IBinder object into an com.afs.rethinkingservice.maidl.MainAidlService interface,
-     * generating a proxy if needed.
+     * generating a buyFoodProxy if needed.
      */
     public static com.afs.rethinkingservice.maidl.MainAidlService asInterface(android.os.IBinder obj) {
         if ((obj == null)) {

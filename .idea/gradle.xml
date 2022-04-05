@@ -16,10 +16,10 @@
             <option value="$PROJECT_DIR$/02ServiceTest" />
             <option value="$PROJECT_DIR$/03ServiceTest" />
             <option value="$PROJECT_DIR$/04ServiceTest" />
+            <option value="$PROJECT_DIR$/05ProxyModel" />
             <option value="$PROJECT_DIR$/ClientTest" />
           </set>
         </option>
-        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

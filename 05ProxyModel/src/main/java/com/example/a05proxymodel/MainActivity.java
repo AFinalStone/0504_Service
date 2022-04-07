@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_proxy_dynamic).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IBuyFood iBuyFood = new XiaoMing();
+                IBuyFood iBuyFood = new XiaoMing();//其实我们并不需要知道XiaoMing这个实例类
                 DynamicBuy dynamicBuy = new DynamicBuy(iBuyFood);
                 ClassLoader classLoader = getClassLoader();
                 IBuyFood proxy = (IBuyFood) Proxy.newProxyInstance(classLoader, new Class[]{IBuyFood.class}, dynamicBuy);

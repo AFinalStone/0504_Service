@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(TAG, "onServiceConnected() executed");
+            Log.d(TAG, "service的类型==================" + service.getClass());
             mBinder = Stub.asInterface(service);
             Log.d(TAG, "mBinder的类型==================" + mBinder.getClass());
         }

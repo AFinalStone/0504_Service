@@ -13,7 +13,6 @@
         android:text="代理模式"
         android:textSize="32sp" />
 
-
     <Button
         android:id="@+id/btn_proxy_static"
         android:layout_width="match_parent"
@@ -21,8 +20,20 @@
         android:text="静态代理" />
 
     <Button
-        android:id="@+id/btn_proxy_dynamic"
+        android:id="@+id/btn_proxy_dynamic01"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="动态代理" />
+
+    <Button
+        android:id="@+id/btn_proxy_dynamic02"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="动态代理并提供代理实例" />
+
+    <Button
+        android:id="@+id/btn_proxy_dynamic03"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="动态代理进阶" />
 </LinearLayout>

@@ -14,8 +14,17 @@ public class BuyFoodProxy implements IBuyFood {
 
     @Override
     public void buyBanana() {
-        Log.d(TAG, "准备买香蕉....");
+        before();
         iBuyFood.buyBanana();
+        after();
+    }
+
+
+    void before() {
+        Log.d(TAG, "准备买香蕉....");
+    }
+
+    void after() {
         Log.d(TAG, "香蕉买完了....");
     }
 }

@@ -927,17 +927,19 @@ public abstract class Stub extends android.os.Binder implements com.afs.rethinki
 ### 4.1 当MainActivity和MainService不在同一个进程的时候：
 
 ```cmd
-2022-03-31 17:16:58.440 6389-6389/com.afs.rethinkingservice03 D/MainActivity=========: onServiceConnected() executed
-2022-03-31 17:16:58.440 6389-6389/com.afs.rethinkingservice03 D/Stub=========: iin的类型==================null
-2022-03-31 17:16:58.440 6389-6389/com.afs.rethinkingservice03 D/MainActivity=========: mBinder的类型==================class com.afs.rethinkingservice.maidl.Proxy
+2022-04-13 01:04:18.802 10185-10185/com.afs.rethinkingservice03 D/MainActivity=========: onServiceConnected() executed
+2022-04-13 01:04:18.802 10185-10185/com.afs.rethinkingservice03 D/MainActivity=========: service的类型==================class com.afs.rethinkingservice.MainService$MainBinder
+2022-04-13 01:04:18.802 10185-10185/com.afs.rethinkingservice03 D/Stub=========: iin的类型==================class com.afs.rethinkingservice.MainService$MainBinder
+2022-04-13 01:04:18.802 10185-10185/com.afs.rethinkingservice03 D/MainActivity=========: mBinder的类型==================class com.afs.rethinkingservice.MainService$MainBinder
 ```
 
 ### 4.2 去掉AndroidManifest中MainService的Process字段，当MainActivity和MainService在同一个进程的时候：
 
 ```cmd
-2022-03-31 17:20:26.020 6722-6722/com.afs.rethinkingservice03 D/MainActivity=========: onServiceConnected() executed
-2022-03-31 17:20:26.020 6722-6722/com.afs.rethinkingservice03 D/Stub=========: iin的类型==================class com.afs.rethinkingservice.MainService$MainBinder
-2022-03-31 17:20:26.021 6722-6722/com.afs.rethinkingservice03 D/MainActivity=========: mBinder的类型==================class com.afs.rethinkingservice.MainService$MainBinder
+2022-04-13 01:03:32.054 10053-10053/com.afs.rethinkingservice03 D/MainActivity=========: onServiceConnected() executed
+2022-04-13 01:03:32.054 10053-10053/com.afs.rethinkingservice03 D/MainActivity=========: service的类型==================class android.os.BinderProxy
+2022-04-13 01:03:32.055 10053-10053/com.afs.rethinkingservice03 D/Stub=========: iin的类型==================null
+2022-04-13 01:03:32.055 10053-10053/com.afs.rethinkingservice03 D/MainActivity=========: mBinder的类型==================class com.afs.rethinkingservice.maidl.Proxy
 ```
 
 通过上面的两端日志信息，可以进一步证明我们的结论：

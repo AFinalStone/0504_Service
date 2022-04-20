@@ -29,11 +29,6 @@
         android:id="@+id/btn_proxy_dynamic02"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="动态代理并提供代理实例" />
-
-    <Button
-        android:id="@+id/btn_proxy_dynamic03"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:text="动态代理进阶" />
+
 </LinearLayout>
